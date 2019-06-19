@@ -14,7 +14,6 @@ import static com.xuxd.chat.common.Constants.Server;
 public class NettyServerConfig extends NettyConfig {
 
     private boolean reuseAddr = true;
-    private boolean keepAlive = true;
 
     public NettyServerConfig() {
     }
@@ -32,14 +31,6 @@ public class NettyServerConfig extends NettyConfig {
     @Override
     public void setReuseAddr(boolean reuseAddr) {
         this.reuseAddr = reuseAddr;
-    }
-
-    public boolean isKeepAlive() {
-        return keepAlive;
-    }
-
-    public void setKeepAlive(boolean keepAlive) {
-        this.keepAlive = keepAlive;
     }
 
     @Override

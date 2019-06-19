@@ -1,7 +1,6 @@
 package com.xuxd.chat.server;
 
 import com.xuxd.chat.common.CmdParser;
-import com.xuxd.chat.server.netty.NettyServer;
 import com.xuxd.chat.server.netty.NettyServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,18 +17,19 @@ public class ServerStartup {
     private static CmdParser cmdParser;
 
     public static void main(String[] args) {
-        LOGGER.info("开始启动服务器");
+        LOGGER.info("start running chat server");
         createServer(args).start();
-        LOGGER.info("服务器启动完成");
+        LOGGER.info("chat server exit");
     }
 
     private static ChatServer createServer(String[] args) {
+        // 初始化命令行参数解析器
         initCmdParser(args);
 
         NettyServerConfig config = new NettyServerConfig();
+        // 设置参数到服务器配置
         cmdParser.cmd2Config(config);
-        NettyServer nettyServer = new NettyServer(config);
-        ChatServer server = new ChatServer(nettyServer);
+        ChatServer server = new ChatServer(config);
         return server;
     }
 
