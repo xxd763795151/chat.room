@@ -1,4 +1,4 @@
-package com.xuxd.chat.server.netty;
+package com.xuxd.chat.client.netty;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -9,12 +9,17 @@ import org.slf4j.LoggerFactory;
 import java.net.SocketAddress;
 
 /**
- * @Auther: 许晓东
- * @Date: 19-6-18 17:51
- * @Description:
+ * Created by dong on 2019/6/19.
  */
-public class NettyServerHandler extends ChannelDuplexHandler {
-    private static final Logger LOGGER = LoggerFactory.getLogger(NettyServerHandler.class);
+public class NettyClientHandler extends ChannelDuplexHandler {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NettyClientHandler.class);
+
+    private NettyClient client;
+
+    public NettyClientHandler(NettyClient client) {
+        this.client = client;
+    }
 
     @Override
     public void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
@@ -40,4 +45,3 @@ public class NettyServerHandler extends ChannelDuplexHandler {
         LOGGER.info("connect", ctx);
     }
 }
-

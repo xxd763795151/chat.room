@@ -2,10 +2,7 @@ package com.xuxd.chat.server.netty;
 
 import com.xuxd.chat.common.netty.NettyRemoting;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -29,6 +26,7 @@ public class NettyServer implements NettyRemoting {
     private NettyServerConfig config;
     private ServerBootstrap bootstrap;
     private EventLoopGroup bossGroup, workerGroup;
+    private Channel channel;
 
     public NettyServer(NettyServerConfig config) {
         this.config = config;
@@ -36,34 +34,43 @@ public class NettyServer implements NettyRemoting {
 
     public void start() {
 
-        try {
-            bootstrap = new ServerBootstrap();
-            bossGroup = new NioEventLoopGroup(config.getBossThreads(), new DefaultThreadFactory("ChatServerBoss", true));
-            workerGroup = new NioEventLoopGroup(config.getWorkerThreads(), new DefaultThreadFactory("ChatServerWorker", true));
-            bootstrap.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .option(ChannelOption.SO_BACKLOG, config.getBacklog())
-                    .option(ChannelOption.SO_REUSEADDR, config.isReuseAddr())
-                    .localAddress(config.getIp(), config.getPort())
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(
-                                    new FixedLengthFrameDecoder(1024)
-                                    , new StringDecoder(Charset.defaultCharset())
-                                    , new NettyServerHandler()
-                            );
-                        }
-                    });
-            ChannelFuture future = bootstrap.bind().syncUninterruptibly();
-            LOGGER.info("chat server started, bind ip:{},port:{}", config.getIp(), config.getPort());
-            future.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
-            LOGGER.error("error: " + e);
-        } finally {
-            workerGroup.shutdownGracefully();
-            bossGroup.shutdownGracefully();
-        }
+        bootstrap = new ServerBootstrap();
+        bossGroup = new NioEventLoopGroup(config.getBossThreads(), new DefaultThreadFactory("ChatServerBoss", true));
+        workerGroup = new NioEventLoopGroup(config.getWorkerThreads(), new DefaultThreadFactory("ChatServerWorker", true));
+        bootstrap.group(bossGroup, workerGroup)
+                .channel(NioServerSocketChannel.class)
+                .option(ChannelOption.SO_BACKLOG, config.getBacklog())
+                .option(ChannelOption.SO_REUSEADDR, config.isReuseAddr())
+                .localAddress(config.getIp(), config.getPort())
+                .childHandler(new ChannelInitializer<SocketChannel>() {
+                    protected void initChannel(SocketChannel ch) throws Exception {
+                        ch.pipeline().addLast(
+                                new FixedLengthFrameDecoder(1024)
+                                , new StringDecoder(Charset.defaultCharset())
+                                , new NettyServerHandler()
+                        );
+                    }
+                });
+        ChannelFuture future = bootstrap.bind().syncUninterruptibly();
+        LOGGER.info("netty server started, bind ip:{},port:{}", config.getIp(), config.getPort());
+        channel = future.channel();
 
+    }
 
+    public void close() {
+        workerGroup.shutdownGracefully();
+        bossGroup.shutdownGracefully();
+    }
+
+    public void send(Object message) {
+
+    }
+
+    public Object receive() {
+        return null;
+    }
+
+    public Channel getChannel() {
+        return channel;
     }
 }
