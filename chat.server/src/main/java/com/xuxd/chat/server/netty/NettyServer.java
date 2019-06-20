@@ -12,6 +12,7 @@ import io.netty.util.concurrent.DefaultThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.SocketAddress;
 import java.nio.charset.Charset;
 
 /**
@@ -19,7 +20,7 @@ import java.nio.charset.Charset;
  * @Date: 19-6-14 16:30
  * @Description: 基于netty实现服务端通信
  */
-public class NettyServer implements NettyRemoting {
+public class NettyServer extends ChannelDuplexHandler implements NettyRemoting {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NettyServer.class);
 
@@ -37,6 +38,7 @@ public class NettyServer implements NettyRemoting {
         bootstrap = new ServerBootstrap();
         bossGroup = new NioEventLoopGroup(config.getBossThreads(), new DefaultThreadFactory("ChatServerBoss", true));
         workerGroup = new NioEventLoopGroup(config.getWorkerThreads(), new DefaultThreadFactory("ChatServerWorker", true));
+        final NettyServer server = this;
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .option(ChannelOption.SO_BACKLOG, config.getBacklog())
@@ -47,7 +49,7 @@ public class NettyServer implements NettyRemoting {
                         ch.pipeline().addLast(
                                 new FixedLengthFrameDecoder(1024)
                                 , new StringDecoder(Charset.defaultCharset())
-                                , new NettyServerHandler()
+                                , server
                         );
                     }
                 });
@@ -72,5 +74,39 @@ public class NettyServer implements NettyRemoting {
 
     public Channel getChannel() {
         return channel;
+    }
+
+    @Override
+    public void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+        super.bind(ctx, localAddress, promise);
+        LOGGER.info("bind {}", localAddress);
+    }
+
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        super.channelRegistered(ctx);
+        LOGGER.info("registered {}", ctx);
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        super.channelActive(ctx);
+        LOGGER.info("channelActive {}", ctx);
+    }
+
+    @Override
+    public void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+        super.connect(ctx, remoteAddress, localAddress, promise);
+        LOGGER.info("connect", ctx);
+    }
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        super.channelRead(ctx, msg);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        LOGGER.info("{},{}", ctx, cause);
     }
 }

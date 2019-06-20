@@ -1,6 +1,6 @@
 package com.xuxd.chat.common;
 
-import com.xuxd.chat.common.exception.BootstarpException;
+import com.xuxd.chat.common.exception.BootstarapException;
 import com.xuxd.chat.common.netty.NettyConfig;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
@@ -92,7 +92,7 @@ public class CmdParser {
                 return null;
             } else {
                 LOGGER.error("初始化参数解析失败", e);
-                throw new BootstarpException("初始化参数解析失败", e);
+                throw new BootstarapException("初始化参数解析失败", e);
             }
         }
     }

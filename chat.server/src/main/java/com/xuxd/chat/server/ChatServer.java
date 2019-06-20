@@ -1,5 +1,6 @@
 package com.xuxd.chat.server;
 
+import com.xuxd.chat.server.gui.Menu;
 import com.xuxd.chat.server.netty.NettyServer;
 import com.xuxd.chat.server.netty.NettyServerConfig;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ public class ChatServer {
 
     private NettyServer nettyServer;
     private NettyServerConfig nettyServerConfig;
+    private Menu menu;
 
     ChatServer(NettyServerConfig config) {
         this.nettyServerConfig = config;
@@ -25,7 +27,7 @@ public class ChatServer {
     public void start() {
         LOGGER.info("start chat room");
         nettyServer.start();
-
+        menu = Menu.create();
         LOGGER.info("start completed");
         try {
             nettyServer.getChannel().closeFuture().sync();

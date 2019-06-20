@@ -16,6 +16,12 @@ import java.net.SocketAddress;
 public class NettyServerHandler extends ChannelDuplexHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(NettyServerHandler.class);
 
+    private NettyServer server;
+
+    public NettyServerHandler(NettyServer server) {
+        this.server = server;
+    }
+
     @Override
     public void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
         super.bind(ctx, localAddress, promise);
@@ -32,12 +38,19 @@ public class NettyServerHandler extends ChannelDuplexHandler {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         LOGGER.info("channelActive {}", ctx);
+        server.channelInactive(ctx);
     }
 
     @Override
     public void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
         super.connect(ctx, remoteAddress, localAddress, promise);
         LOGGER.info("connect", ctx);
+    }
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        super.channelRead(ctx, msg);
+        server.channelRead(ctx, msg);
     }
 }
 
