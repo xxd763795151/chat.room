@@ -1,15 +1,16 @@
 package com.xuxd.chat.client.netty;
 
+import com.xuxd.chat.client.ChatClient;
+import com.xuxd.chat.common.Constants;
 import com.xuxd.chat.common.netty.NettyRemoting;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.FixedLengthFrameDecoder;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import org.slf4j.Logger;
@@ -28,51 +29,50 @@ public class NettyClient implements NettyRemoting {
     private NettyClientConfig nettyClientConfig;
     private Bootstrap bootstrap;
     private EventLoopGroup workerGroup;
+    private ChatClient chatClient;
+    private Channel channel;
 
     public NettyClient(NettyClientConfig nettyClientConfig) {
         this.nettyClientConfig = nettyClientConfig;
     }
 
+    public NettyClient(NettyClientConfig nettyClientConfig, ChatClient chatClient) {
+        this.nettyClientConfig = nettyClientConfig;
+        this.chatClient = chatClient;
+    }
 
     public void start() {
-        try {
-            bootstrap = new Bootstrap();
-            workerGroup = new NioEventLoopGroup(nettyClientConfig.getWorkerThreads(), new DefaultThreadFactory("ChatClientWorker"));
+        bootstrap = new Bootstrap();
+        workerGroup = new NioEventLoopGroup(nettyClientConfig.getWorkerThreads(), new DefaultThreadFactory("ChatClientWorker"));
 
-            final NettyClient client = this;
-            bootstrap.group(workerGroup)
-                    .channel(NioSocketChannel.class)
-                    .option(ChannelOption.SO_REUSEADDR, nettyClientConfig.isReuseAddr())
-                    .option(ChannelOption.SO_KEEPALIVE, nettyClientConfig.isKeepAlive())
-                    .remoteAddress(nettyClientConfig.getIp(), nettyClientConfig.getPort())
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(
-                                    new FixedLengthFrameDecoder(1024)
-                                    , new StringDecoder(Charset.defaultCharset())
-                                    , new NettyClientHandler(client)
-                            );
-                        }
-                    });
-            ChannelFuture future = bootstrap.connect().syncUninterruptibly();
-            future.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
-            LOGGER.error("fatal error: ", e);
-        } finally {
-            workerGroup.shutdownGracefully();
-        }
+        final ChannelHandler handler = new NettyClientHandler(chatClient);
+        bootstrap.group(workerGroup)
+                .channel(NioSocketChannel.class)
+                .option(ChannelOption.SO_REUSEADDR, nettyClientConfig.isReuseAddr())
+                .option(ChannelOption.SO_KEEPALIVE, nettyClientConfig.isKeepAlive())
+                .remoteAddress(nettyClientConfig.getIp(), nettyClientConfig.getPort())
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    protected void initChannel(SocketChannel ch) throws Exception {
+                        ByteBuf delimiter = Unpooled.copiedBuffer(Constants.Delimiter.DEFAULT.getBytes(Constants.CharsetName.UTF_8));
+                        ch.pipeline().addLast(
+                                new DelimiterBasedFrameDecoder(65535, delimiter)
+                                , new StringDecoder(Charset.forName(Constants.CharsetName.UTF_8))
+                                , handler
+                        );
+                    }
+                });
+        ChannelFuture future = bootstrap.connect().syncUninterruptibly();
+        channel = future.channel();
 
     }
 
     public void close() {
+        workerGroup.shutdownGracefully();
 
     }
 
-    public void send(Object message) {
-
+    public Channel getChannel() {
+        return channel;
     }
 
-    public Object receive() {
-        return null;
-    }
 }

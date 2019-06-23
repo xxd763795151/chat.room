@@ -5,14 +5,14 @@ package com.xuxd.chat.common.exception;
  * @Date: 19-6-14 16:12
  * @Description: 启动异常
  */
-public class BootstarapException extends RuntimeException {
+public class BootstrapException extends RuntimeException {
 
     private String message;
     private Throwable throwable;
 
-    public BootstarapException(String message, Throwable cause) {
+    public BootstrapException(String message, Throwable cause) {
         super(message, cause);
         this.message = message;
-        this.throwable = throwable;
+        this.throwable = cause;
     }
 }

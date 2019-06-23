@@ -1,5 +1,6 @@
 package com.xuxd.chat.client.netty;
 
+import com.xuxd.chat.client.ChatClient;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
@@ -16,9 +17,14 @@ public class NettyClientHandler extends ChannelDuplexHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(NettyClientHandler.class);
 
     private NettyClient client;
+    private ChatClient chatClient;
 
     public NettyClientHandler(NettyClient client) {
         this.client = client;
+    }
+
+    public NettyClientHandler(ChatClient chatClient) {
+        this.chatClient = chatClient;
     }
 
     @Override
@@ -43,5 +49,24 @@ public class NettyClientHandler extends ChannelDuplexHandler {
     public void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
         super.connect(ctx, remoteAddress, localAddress, promise);
         LOGGER.info("connect", ctx);
+    }
+
+    @Override
+    public void read(ChannelHandlerContext ctx) throws Exception {
+        super.read(ctx);
+        LOGGER.info("read", ctx);
+        chatClient.read(ctx);
+    }
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        LOGGER.info("channelRead", ctx);
+        chatClient.channelRead(ctx, msg);
+    }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        super.channelReadComplete(ctx);
+        LOGGER.info("channelReadComplete", ctx);
     }
 }

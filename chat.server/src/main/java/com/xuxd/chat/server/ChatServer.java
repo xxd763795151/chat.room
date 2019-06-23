@@ -1,8 +1,14 @@
 package com.xuxd.chat.server;
 
+import com.xuxd.chat.common.Constants;
+import com.xuxd.chat.common.MessageUtils;
+import com.xuxd.chat.common.netty.AbstractEndpoint;
 import com.xuxd.chat.server.gui.Menu;
 import com.xuxd.chat.server.netty.NettyServer;
 import com.xuxd.chat.server.netty.NettyServerConfig;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * @Date: 19-6-14 14:45
  * @Description: 聊天服务器初始化
  */
-public class ChatServer {
+public class ChatServer extends AbstractEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatServer.class);
 
@@ -21,7 +27,7 @@ public class ChatServer {
 
     ChatServer(NettyServerConfig config) {
         this.nettyServerConfig = config;
-        this.nettyServer = new NettyServer(nettyServerConfig);
+        this.nettyServer = new NettyServer(nettyServerConfig, this);
     }
 
     public void start() {
@@ -34,11 +40,21 @@ public class ChatServer {
         } catch (InterruptedException e) {
             LOGGER.error("error: " + e);
         } finally {
-            close();
+            shutdown();
         }
     }
 
-    public void close() {
+    @Override
+    public void shutdown() {
         nettyServer.close();
+
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        String welcome = MessageUtils.concatDefaultDelimiter(menu.welcome());
+        ByteBuf byteBuf = Unpooled.buffer(welcome.length());
+        byteBuf.writeBytes(welcome.getBytes(Constants.CharsetName.UTF_8));
+        ctx.writeAndFlush(byteBuf);
     }
 }

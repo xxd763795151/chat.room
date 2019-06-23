@@ -13,4 +13,12 @@ public class Constants {
         String HOST_S = "i";
         String PORT_S = "p";
     }
+
+    public interface CharsetName {
+        String UTF_8 = "UTF-8";
+    }
+
+    public interface Delimiter {
+        String DEFAULT = "$_$";
+    }
 }

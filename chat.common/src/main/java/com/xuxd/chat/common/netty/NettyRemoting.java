@@ -1,5 +1,7 @@
 package com.xuxd.chat.common.netty;
 
+import io.netty.channel.Channel;
+
 /**
  * @Auther: 许晓东
  * @Date: 19-6-18 17:31
@@ -11,7 +13,6 @@ public interface NettyRemoting {
 
     void close();
 
-    void send(Object message);
+    Channel getChannel();
 
-    Object receive();
 }
