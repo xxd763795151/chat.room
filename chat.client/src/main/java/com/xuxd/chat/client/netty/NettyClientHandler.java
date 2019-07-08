@@ -69,4 +69,10 @@ public class NettyClientHandler extends ChannelDuplexHandler {
         super.channelReadComplete(ctx);
         LOGGER.info("channelReadComplete", ctx);
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        super.exceptionCaught(ctx, cause);
+        chatClient.exceptionCaught(ctx, cause);
+    }
 }

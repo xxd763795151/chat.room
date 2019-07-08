@@ -1,4 +1,4 @@
-package com.xuxd.chat.server.gui;
+package com.xuxd.chat.common.menu;
 
 import com.xuxd.chat.common.Constants;
 import com.xuxd.chat.common.exception.BootstrapException;
@@ -33,7 +33,7 @@ final public class Menu {
     private void initialize() {
         LOGGER.info("initialize menu");
         welcome();
-
+        menu();
     }
 
     public String welcome() {
@@ -57,7 +57,21 @@ final public class Menu {
     }
 
     public String menu() {
-        menu = "";
+        if (menu == null) {
+            synchronized (this) {
+                if (menu == null) {
+                    try {
+                        try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("menu.txt")) {
+                            byte[] bytes = new byte[inputStream.available()];
+                            IOUtils.read(inputStream, bytes);
+                            menu = new String(bytes, Constants.CharsetName.UTF_8);
+                        }
+                    } catch (IOException e) {
+                        throw new BootstrapException("文件读取失败", e);
+                    }
+                }
+            }
+        }
         return menu;
     }
 }
