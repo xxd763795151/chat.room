@@ -20,7 +20,7 @@ public class ChatClient extends AbstractEndpoint {
 
     private NettyClient nettyClient;
     private NettyClientConfig nettyClientConfig;
-    private Boolean firstMessage = true;
+    private Boolean firstMessageUnReached = true;
 
     public ChatClient(NettyClientConfig nettyClientConfig) {
         this.nettyClientConfig = nettyClientConfig;
@@ -35,9 +35,9 @@ public class ChatClient extends AbstractEndpoint {
         while (true) {
             try {
                 // 第一条消息还未到来
-                if (firstMessage) {
+                if (firstMessageUnReached) {
                     synchronized (this) {
-                        if (firstMessage) {
+                        if (firstMessageUnReached) {
                             this.wait();
                         }
                     }
@@ -80,10 +80,10 @@ public class ChatClient extends AbstractEndpoint {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (firstMessage) {
+        if (firstMessageUnReached) {
             synchronized (this) {
-                if (firstMessage) {
-                    firstMessage = !firstMessage;
+                if (firstMessageUnReached) {
+                    firstMessageUnReached = !firstMessageUnReached;
                     echo((String) msg);
                     this.notify();
                 }
