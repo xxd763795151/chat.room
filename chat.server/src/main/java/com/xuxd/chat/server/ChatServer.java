@@ -2,8 +2,9 @@ package com.xuxd.chat.server;
 
 import com.xuxd.chat.common.Constants;
 import com.xuxd.chat.common.MessageUtils;
-import com.xuxd.chat.common.netty.AbstractEndpoint;
 import com.xuxd.chat.common.menu.Menu;
+import com.xuxd.chat.common.netty.AbstractEndpoint;
+import com.xuxd.chat.server.manage.ClientManager;
 import com.xuxd.chat.server.netty.NettyServer;
 import com.xuxd.chat.server.netty.NettyServerConfig;
 import io.netty.buffer.ByteBuf;
@@ -24,6 +25,7 @@ public class ChatServer extends AbstractEndpoint {
     private NettyServer nettyServer;
     private NettyServerConfig nettyServerConfig;
     private Menu menu;
+    private ClientManager clientManager = new ClientManager();
 
     ChatServer(NettyServerConfig config) {
         this.nettyServerConfig = config;
@@ -51,10 +53,17 @@ public class ChatServer extends AbstractEndpoint {
     }
 
     @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        super.channelRead(ctx, msg);
+    }
+
+    @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         String welcome = MessageUtils.concatDefaultDelimiter(menu.welcome() + "\r\n" + menu.menu());
         ByteBuf byteBuf = Unpooled.buffer(welcome.length());
         byteBuf.writeBytes(welcome.getBytes(Constants.CharsetName.UTF_8));
         ctx.writeAndFlush(byteBuf);
+        // 注册客户端channel
+        clientManager.registerClient(ctx.channel());
     }
 }

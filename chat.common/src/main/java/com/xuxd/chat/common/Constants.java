@@ -21,4 +21,9 @@ public class Constants {
     public interface Delimiter {
         String DEFAULT = "$_$";
     }
+
+    public interface MsgType {
+        int COMMOND = 1 << 0;
+        int MESSAGE = 1 << 1;
+    }
 }
