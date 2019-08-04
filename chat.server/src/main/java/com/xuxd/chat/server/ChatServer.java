@@ -1,14 +1,12 @@
 package com.xuxd.chat.server;
 
 import com.xuxd.chat.common.Constants;
-import com.xuxd.chat.common.MessageUtils;
+import com.xuxd.chat.common.common.Message;
 import com.xuxd.chat.common.menu.Menu;
 import com.xuxd.chat.common.netty.AbstractEndpoint;
 import com.xuxd.chat.server.manage.ClientManager;
 import com.xuxd.chat.server.netty.NettyServer;
 import com.xuxd.chat.server.netty.NettyServerConfig;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,11 +57,20 @@ public class ChatServer extends AbstractEndpoint {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        String welcome = MessageUtils.concatDefaultDelimiter(menu.welcome() + "\r\n" + menu.menu());
+        String welcome = menu.welcome() + "\r\n" + menu.menu();
+        /*String welcome = MessageUtils.concatDefaultDelimiter(menu.welcome() + "\r\n" + menu.menu());
         ByteBuf byteBuf = Unpooled.buffer(welcome.length());
-        byteBuf.writeBytes(welcome.getBytes(Constants.CharsetName.UTF_8));
-        ctx.writeAndFlush(byteBuf);
+        byteBuf.writeBytes(welcome.getBytes(Constants.CharsetName.UTF_8));*/
+        Message message = new Message(Constants.MsgType.MESSAGE, welcome);
+        ctx.write(message);
+        ctx.flush();
+        //ctx.writeAndFlush(message);
         // 注册客户端channel
         clientManager.registerClient(ctx.channel());
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        LOGGER.error("ctx:{}, exception:{]", ctx, cause);
     }
 }

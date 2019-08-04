@@ -12,7 +12,7 @@ public enum MenuOptions {
 
     CHAT_ROOM("#1"),
     MENU("#0"),
-    ERROR("#9999"){
+    ERROR("#9999") {
         {
             innerMap.put("#1", "CHAT_ROOM");
             innerMap.put("#0", "MENU");

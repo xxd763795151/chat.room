@@ -54,7 +54,7 @@ public class NettyClientHandler extends ChannelDuplexHandler {
     @Override
     public void read(ChannelHandlerContext ctx) throws Exception {
         super.read(ctx);
-        LOGGER.info("read", ctx);
+        LOGGER.info("read:{}", ctx);
         chatClient.read(ctx);
     }
 

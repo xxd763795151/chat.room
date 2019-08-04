@@ -59,6 +59,7 @@ public class NettyServerHandler extends ChannelDuplexHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         LOGGER.info("{},{}", ctx, cause);
+        chatServer.exceptionCaught(ctx, cause);
     }
 
     @Override
@@ -70,7 +71,7 @@ public class NettyServerHandler extends ChannelDuplexHandler {
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
         super.channelUnregistered(ctx);
-        LOGGER.info("channelUnregistered: {}" , ctx);
+        LOGGER.info("channelUnregistered: {}", ctx);
         chatServer.channelUnregistered(ctx);
     }
 
@@ -79,5 +80,7 @@ public class NettyServerHandler extends ChannelDuplexHandler {
         super.channelReadComplete(ctx);
         LOGGER.info("channelReadComplete: {}" + ctx);
     }
+
+
 }
 

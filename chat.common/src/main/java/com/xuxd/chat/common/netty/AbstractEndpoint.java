@@ -13,7 +13,7 @@ public abstract class AbstractEndpoint extends ChannelDuplexHandler {
 
     public abstract void shutdown();
 
-    public void echo(String message) {
+    public void echo(Object message) {
         System.out.println(message);
     }
 

@@ -1,22 +1,19 @@
 package com.xuxd.chat.client.netty;
 
 import com.xuxd.chat.client.ChatClient;
-import com.xuxd.chat.common.Constants;
 import com.xuxd.chat.common.netty.NettyRemoting;
+import com.xuxd.chat.common.netty.decoder.MsgPackDecoder;
+import com.xuxd.chat.common.netty.encoder.MsgPackEncoder;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.charset.Charset;
 
 /**
  * Created by dong on 2019/6/19.
@@ -53,10 +50,14 @@ public class NettyClient implements NettyRemoting {
                 .remoteAddress(nettyClientConfig.getIp(), nettyClientConfig.getPort())
                 .handler(new ChannelInitializer<SocketChannel>() {
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ByteBuf delimiter = Unpooled.copiedBuffer(Constants.Delimiter.DEFAULT.getBytes(Constants.CharsetName.UTF_8));
+                        // ByteBuf delimiter = Unpooled.copiedBuffer(Constants.Delimiter.DEFAULT.getBytes(Constants.CharsetName.UTF_8));
                         ch.pipeline().addLast(
-                                new DelimiterBasedFrameDecoder(65535, delimiter)
-                                , new StringDecoder(Charset.forName(Constants.CharsetName.UTF_8))
+                               /* new DelimiterBasedFrameDecoder(65535, delimiter)
+                                , new StringDecoder(Charset.forName(Constants.CharsetName.UTF_8))*/
+                                new LengthFieldBasedFrameDecoder(65535, 0, 2, 0, 2)
+                                , new MsgPackDecoder()
+                                , new LengthFieldPrepender(2)
+                                , new MsgPackEncoder()
                                 , handler
                         );
                     }

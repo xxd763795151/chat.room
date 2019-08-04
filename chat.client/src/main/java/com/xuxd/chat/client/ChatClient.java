@@ -73,10 +73,6 @@ public class ChatClient extends AbstractEndpoint {
         System.exit(0);
     }
 
-    @Override
-    public void read(ChannelHandlerContext ctx) throws Exception {
-
-    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -84,12 +80,12 @@ public class ChatClient extends AbstractEndpoint {
             synchronized (this) {
                 if (firstMessageUnReached) {
                     firstMessageUnReached = !firstMessageUnReached;
-                    echo((String) msg);
+                    echo(msg);
                     this.notify();
                 }
             }
         } else {
-            echo((String) msg);
+            echo(msg);
         }
     }
 
