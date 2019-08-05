@@ -1,9 +1,11 @@
 package com.xuxd.chat.common.netty.decoder;
 
+import com.xuxd.chat.common.common.Message;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import org.msgpack.MessagePack;
+import org.msgpack.type.RawValue;
 
 import java.util.List;
 
@@ -21,6 +23,7 @@ public class MsgPackDecoder extends MessageToMessageDecoder<ByteBuf> {
         final byte[] bytes = new byte[length];
 
         msg.getBytes(msg.readerIndex(), bytes, 0, length);
-        out.add(messagePack.read(bytes));
+        //RawValue value = (RawValue)messagePack.read(bytes);
+        out.add(messagePack.read(bytes, Message.class));
     }
 }
