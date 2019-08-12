@@ -62,7 +62,19 @@ public class ChatServer extends AbstractEndpoint<Message> {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        super.channelRead(ctx, msg);
+        Message message = (Message) msg;
+        switch (message.getType()) {
+            case Constants.MsgType.COMMAND:
+                clientManager.switchState(ctx.channel(), message);
+                break;
+            case Constants.MsgType.MESSAGE:
+            case Constants.MsgType.NOTIFY:
+                // 转发消息
+                clientManager.dispatcher(ctx.channel(), message);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -71,7 +83,7 @@ public class ChatServer extends AbstractEndpoint<Message> {
         /*String welcome = MessageUtils.concatDefaultDelimiter(menu.welcome() + "\r\n" + menu.menu());
         ByteBuf byteBuf = Unpooled.buffer(welcome.length());
         byteBuf.writeBytes(welcome.getBytes(Constants.CharsetName.UTF_8));*/
-        Message message = new Message(Constants.MsgType.MESSAGE, welcome);
+        Message message = new Message(Constants.MsgType.NOTIFY, welcome);
         ctx.write(message);
         ctx.flush();
         //ctx.writeAndFlush(message);

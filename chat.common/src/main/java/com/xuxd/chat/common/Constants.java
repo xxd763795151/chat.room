@@ -23,8 +23,14 @@ public class Constants {
     }
 
     public interface MsgType {
-        int COMMOND = 1 << 0;
+        int COMMAND = 1 << 0;
         int MESSAGE = 1 << 1;
+        int NOTIFY = 1 << 2;
+    }
+
+    public interface Command {
+        String ENTER_CHAT_ROOM = "chat_room_command";
+        String RETURN_MEUN = "return_menu_command";
     }
 
     // 回车换行符

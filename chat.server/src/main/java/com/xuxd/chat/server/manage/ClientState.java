@@ -3,6 +3,7 @@ package com.xuxd.chat.server.manage;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelId;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -13,11 +14,12 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class ClientState {
 
-    private ConcurrentMap<ChannelId, Channel> channelConcurrentMap = new ConcurrentHashMap<>();
+    private ConcurrentMap<ChannelId, Channel> channelConcurrentMap = new ConcurrentHashMap<ChannelId, Channel>();
 
     static enum State {
         ACTIVE,
-        CHAT_ROOM;
+        CHAT_ROOM,
+        UNKNOWN;
     }
 
 
@@ -26,5 +28,11 @@ public class ClientState {
     }
 
 
+    public boolean isCurrentState(Channel channel) {
+        return channelConcurrentMap.containsKey(channel.id());
+    }
 
+    public ConcurrentMap<ChannelId, Channel> getChannels() {
+        return channelConcurrentMap;
+    }
 }

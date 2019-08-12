@@ -2,6 +2,10 @@ package com.xuxd.chat.client;
 
 import com.xuxd.chat.client.netty.NettyClient;
 import com.xuxd.chat.client.netty.NettyClientConfig;
+import com.xuxd.chat.client.processor.ChatRoomProcessor;
+import com.xuxd.chat.client.processor.Processor;
+import com.xuxd.chat.common.Constants;
+import com.xuxd.chat.common.common.Assert;
 import com.xuxd.chat.common.common.Message;
 import com.xuxd.chat.common.menu.MenuOptions;
 import com.xuxd.chat.common.netty.AbstractEndpoint;
@@ -9,6 +13,9 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.xuxd.chat.common.Constants.RETURN_NEW_LINE;
 
@@ -24,6 +31,7 @@ public class ChatClient extends AbstractEndpoint<Message> {
     private boolean quit = false;
     private Channel channel;
     private String clientName;
+    private Map<MenuOptions, Processor> processorMap = new HashMap<>();
 
     public ChatClient(NettyClientConfig nettyClientConfig) {
         this.nettyClientConfig = nettyClientConfig;
@@ -54,7 +62,7 @@ public class ChatClient extends AbstractEndpoint<Message> {
                         System.out.println(">>>>回到主菜单");
                         break;
                     case CHAT_ROOM:
-                        System.out.println(">>>>进入聊天室");
+                        processorMap.get(MenuOptions.CHAT_ROOM).run();
                         break;
                     case QUIT1:
                     case QUIT2:
@@ -67,6 +75,9 @@ public class ChatClient extends AbstractEndpoint<Message> {
                 }
             } catch (InterruptedException ignore) {
                 LOGGER.error("interrupt: ", ignore);
+            } catch (Exception e) {
+                LOGGER.error("error: ", e);
+                quit = true;
             }
             if (quit) {
                 break;
@@ -78,6 +89,11 @@ public class ChatClient extends AbstractEndpoint<Message> {
 
     private void resetBytes(byte[] bytes) {
         //Arrays.fi
+    }
+
+    private void registerProcessors() {
+        Assert.notNull(clientName);
+        processorMap.put(MenuOptions.CHAT_ROOM, new ChatRoomProcessor(this, clientName));
     }
 
     public void shutdown() {
@@ -104,12 +120,28 @@ public class ChatClient extends AbstractEndpoint<Message> {
                         clientName = inputName;
                     }
                     System.out.println("你好： " + clientName);
-                    echo(message);
+                    //
+                    registerProcessors();
+
+                    handleMessage(message);
                     this.notify();
                 }
             }
         } else {
-            echo(message);
+            handleMessage(message);
+        }
+    }
+
+    private void handleMessage(Message message) {
+        switch (message.getType()) {
+            case Constants.MsgType.MESSAGE:
+
+                break;
+            case Constants.MsgType.NOTIFY:
+                echo(message.getBody());
+                break;
+            default:
+                break;
         }
     }
 
