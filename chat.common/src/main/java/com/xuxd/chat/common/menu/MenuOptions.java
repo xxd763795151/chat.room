@@ -12,11 +12,15 @@ public enum MenuOptions {
 
     CHAT_ROOM("#1"),
     MENU("#0"),
+    QUIT1("#9"),
+    QUIT2("quit"),
     ERROR("#9999") {
         {
             innerMap.put("#1", "CHAT_ROOM");
             innerMap.put("#0", "MENU");
             innerMap.put("#9999", "ERROR");
+            innerMap.put("#9", "QUIT1");
+            innerMap.put("quit", "QUIT2");
         }
     };
 

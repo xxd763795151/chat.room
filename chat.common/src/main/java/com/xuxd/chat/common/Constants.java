@@ -26,4 +26,7 @@ public class Constants {
         int COMMOND = 1 << 0;
         int MESSAGE = 1 << 1;
     }
+
+    // 回车换行符
+    public static String RETURN_NEW_LINE = System.getProperty("line.separator");
 }

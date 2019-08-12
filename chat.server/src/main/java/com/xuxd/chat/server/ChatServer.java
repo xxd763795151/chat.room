@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  * @Date: 19-6-14 14:45
  * @Description: 聊天服务器初始化
  */
-public class ChatServer extends AbstractEndpoint {
+public class ChatServer extends AbstractEndpoint<Message> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatServer.class);
 
@@ -51,13 +51,23 @@ public class ChatServer extends AbstractEndpoint {
     }
 
     @Override
+    public void write(Message message) throws Exception {
+
+    }
+
+    @Override
+    public void receive(Message message) throws Exception {
+
+    }
+
+    @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         super.channelRead(ctx, msg);
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        String welcome = menu.welcome() + "\r\n" + menu.menu();
+        String welcome = menu.welcome() + Constants.RETURN_NEW_LINE + menu.menu();
         /*String welcome = MessageUtils.concatDefaultDelimiter(menu.welcome() + "\r\n" + menu.menu());
         ByteBuf byteBuf = Unpooled.buffer(welcome.length());
         byteBuf.writeBytes(welcome.getBytes(Constants.CharsetName.UTF_8));*/

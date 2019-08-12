@@ -2,25 +2,28 @@ package com.xuxd.chat.client;
 
 import com.xuxd.chat.client.netty.NettyClient;
 import com.xuxd.chat.client.netty.NettyClientConfig;
+import com.xuxd.chat.common.common.Message;
 import com.xuxd.chat.common.menu.MenuOptions;
 import com.xuxd.chat.common.netty.AbstractEndpoint;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
-import static com.xuxd.chat.common.Constants.CharsetName;
+import static com.xuxd.chat.common.Constants.RETURN_NEW_LINE;
 
 /**
  * Created by dong on 2019/6/19.
  */
-public class ChatClient extends AbstractEndpoint {
+public class ChatClient extends AbstractEndpoint<Message> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatClient.class);
 
     private NettyClient nettyClient;
     private NettyClientConfig nettyClientConfig;
     private Boolean firstMessageUnReached = true;
+    private boolean quit = false;
+    private Channel channel;
+    private String clientName;
 
     public ChatClient(NettyClientConfig nettyClientConfig) {
         this.nettyClientConfig = nettyClientConfig;
@@ -32,6 +35,7 @@ public class ChatClient extends AbstractEndpoint {
     public void start() {
         LOGGER.info("start chat client");
         this.nettyClient.start();
+        channel = nettyClient.getChannel();
         while (true) {
             try {
                 // 第一条消息还未到来
@@ -41,11 +45,10 @@ public class ChatClient extends AbstractEndpoint {
                             this.wait();
                         }
                     }
+
                 }
                 inputPrompt("请输入你的选项（#+数字）: ");
-                byte[] input = new byte[_1K];
-                System.in.read(input);
-                MenuOptions option = MenuOptions.valueOf2(new String(input, CharsetName.UTF_8));
+                MenuOptions option = MenuOptions.valueOf2(input());
                 switch (option) {
                     case MENU:
                         System.out.println(">>>>回到主菜单");
@@ -53,19 +56,28 @@ public class ChatClient extends AbstractEndpoint {
                     case CHAT_ROOM:
                         System.out.println(">>>>进入聊天室");
                         break;
+                    case QUIT1:
+                    case QUIT2:
+                        quit = true;
+                        break;
                     case ERROR:
                     default:
                         System.out.println("无效选项");
                         break;
                 }
-            } catch (IOException e) {
-                LOGGER.error("读取输入失败，退出", e);
-                shutdown();
             } catch (InterruptedException ignore) {
                 LOGGER.error("interrupt: ", ignore);
             }
+            if (quit) {
+                break;
+            }
         }
+        System.out.println("退出客户端!!!");
+        shutdown();
+    }
 
+    private void resetBytes(byte[] bytes) {
+        //Arrays.fi
     }
 
     public void shutdown() {
@@ -73,21 +85,34 @@ public class ChatClient extends AbstractEndpoint {
         System.exit(0);
     }
 
+    @Override
+    public void write(Message message) {
+        channel.writeAndFlush(message);
+    }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void receive(Message message) {
         if (firstMessageUnReached) {
             synchronized (this) {
                 if (firstMessageUnReached) {
                     firstMessageUnReached = !firstMessageUnReached;
-                    echo(msg);
+                    inputPrompt("起个名字：");
+                    String inputName = input();
+                    if (RETURN_NEW_LINE.equals(inputName)) {
+                        clientName = "用户_" + String.valueOf(System.currentTimeMillis()).substring(6);
+                    } else {
+                        clientName = inputName;
+                    }
+                    System.out.println("你好： " + clientName);
+                    echo(message);
                     this.notify();
                 }
             }
         } else {
-            echo(msg);
+            echo(message);
         }
     }
+
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {

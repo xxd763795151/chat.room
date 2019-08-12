@@ -1,6 +1,7 @@
 package com.xuxd.chat.client.netty;
 
 import com.xuxd.chat.client.ChatClient;
+import com.xuxd.chat.common.common.Message;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
@@ -61,7 +62,7 @@ public class NettyClientHandler extends ChannelDuplexHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         LOGGER.info("channelRead", ctx);
-        chatClient.channelRead(ctx, msg);
+        chatClient.receive((Message) msg);
     }
 
     @Override
