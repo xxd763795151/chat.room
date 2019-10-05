@@ -1,6 +1,11 @@
 package com.xuxd.chat.common.common;
 
+import com.alibaba.fastjson.JSONObject;
+import org.msgpack.annotation.Optional;
+
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Auther: 许晓东
@@ -8,12 +13,17 @@ import java.io.Serializable;
  * @Description:
  */
 @org.msgpack.annotation.Message
-public class Message implements Serializable {
+public class Message extends JSONObject implements Serializable {
 
     private int type;
     private String body;
+    private Map<String, String> attachment = new HashMap<>();
 
     public Message() {
+    }
+
+    public Message(int type) {
+        this.type = type;
     }
 
     public Message(int type, String body) {
@@ -37,9 +47,28 @@ public class Message implements Serializable {
         this.body = body;
     }
 
+    public Map<String, String> getAttachment() {
+        return attachment;
+    }
+
+    public void setAttachment(Map<String, String> attachment) {
+        this.attachment = attachment;
+    }
+
+     @Override
+    public Object put(String key, Object value) {
+        return attachment.put(key, String.valueOf(value));
+    }
+
+    @Override
+    public Map<String, Object> getInnerMap() {
+        Map<String, Object> map = new HashMap<>(attachment);
+        return map;
+    }
+
     @Override
     public String toString() {
-        return body;
+        return super.toString();
     }
 
 }

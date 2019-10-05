@@ -64,7 +64,7 @@ public class ChatServer extends AbstractEndpoint<Message> {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Message message = (Message) msg;
         switch (message.getType()) {
-            case Constants.MsgType.COMMAND:
+            case Constants.MsgType.COMMAND: //指令类型的消息：回到菜单、进入聊天室等
                 clientManager.switchState(ctx.channel(), message);
                 break;
             case Constants.MsgType.MESSAGE:
@@ -80,19 +80,19 @@ public class ChatServer extends AbstractEndpoint<Message> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         String welcome = menu.welcome() + Constants.RETURN_NEW_LINE + menu.menu();
-        /*String welcome = MessageUtils.concatDefaultDelimiter(menu.welcome() + "\r\n" + menu.menu());
-        ByteBuf byteBuf = Unpooled.buffer(welcome.length());
-        byteBuf.writeBytes(welcome.getBytes(Constants.CharsetName.UTF_8));*/
         Message message = new Message(Constants.MsgType.NOTIFY, welcome);
         ctx.write(message);
         ctx.flush();
-        //ctx.writeAndFlush(message);
-        // 注册客户端channel
-        clientManager.registerClient(ctx.channel());
+        clientManager.registerClient(ctx.channel(), message.getInnerMap());
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         LOGGER.error("ctx:{}, exception:{]", ctx, cause);
+    }
+
+    @Override
+    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        clientManager.unregisterClient(ctx.channel());
     }
 }

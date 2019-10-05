@@ -35,4 +35,8 @@ public class Constants {
 
     // 回车换行符
     public static String RETURN_NEW_LINE = System.getProperty("line.separator");
+
+    public interface MessageKeys {
+        String CLIENT_NAME = "clientName";
+    }
 }

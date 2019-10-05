@@ -7,6 +7,7 @@ import io.netty.channel.ChannelId;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -19,18 +20,24 @@ public class ClientManager {
     private Map<ClientState.State, ClientState> clientStateMap = new HashMap<ClientState.State, ClientState>();
 
 
-    public void registerClient(Channel channel) {
+    public void registerClient(Channel channel, Map<String, Object> properties) {
         // 激活状态
         if (!clientStateMap.containsKey(ClientState.State.ACTIVE)) {
             synchronized (clientStateMap) {
                 if (!clientStateMap.containsKey(ClientState.State.ACTIVE)) {
-                    clientStateMap.put(ClientState.State.ACTIVE, new ClientState());
+                    clientStateMap.put(ClientState.State.ACTIVE, new ClientState(ClientState.State.ACTIVE));
                 }
             }
         }
         ClientState clientState = clientStateMap.get(ClientState.State.ACTIVE);
 
-        clientState.register(channel);
+        clientState.register(channel, properties);
+    }
+
+    public void unregisterClient(Channel channel) {
+        for (ClientState clientState : clientStateMap.values()) {
+            clientState.unregister(channel);
+        }
     }
 
     public void dispatcher(Channel src, Message message) {
@@ -75,15 +82,14 @@ public class ClientManager {
             if (!clientStateMap.containsKey(ClientState.State.CHAT_ROOM)) {
                 synchronized (clientStateMap) {
                     if (!clientStateMap.containsKey(ClientState.State.CHAT_ROOM)) {
-                        clientStateMap.putIfAbsent(ClientState.State.CHAT_ROOM, new ClientState());
+                        clientStateMap.putIfAbsent(ClientState.State.CHAT_ROOM, new ClientState(ClientState.State.CHAT_ROOM));
                     }
                 }
-                clientStateMap.putIfAbsent(ClientState.State.CHAT_ROOM, new ClientState());
             }
             ClientState clientState = clientStateMap.get(ClientState.State.CHAT_ROOM);
-            clientState.getChannels().putIfAbsent(src.id(), src);
+            clientState.register(src, message.getInnerMap());
         } else if (Constants.Command.RETURN_MEUN.equals(command)) {
-            registerClient(src);
+            registerClient(src, message.getInnerMap());
         }
     }
 
