@@ -1,4 +1,4 @@
-package com.xuxd.chat.common.common;
+package com.xuxd.chat.common.beans;
 
 import com.alibaba.fastjson.JSONObject;
 import org.msgpack.annotation.Optional;

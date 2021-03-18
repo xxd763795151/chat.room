@@ -17,8 +17,6 @@ public abstract class NettyConfig {
     protected boolean reuseAddr = true;
     protected int backlog = 1024;
 
-
-
     public String getIp() {
         return ip;
     }

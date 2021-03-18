@@ -1,4 +1,6 @@
-package com.xuxd.chat.common;
+package com.xuxd.chat.common.utils;
+
+import com.xuxd.chat.common.Constants;
 
 /**
  * @Auther: 许晓东

@@ -1,4 +1,4 @@
-package com.xuxd.chat.common.common;
+package com.xuxd.chat.common;
 
 import com.xuxd.chat.common.exception.AssertExcession;
 

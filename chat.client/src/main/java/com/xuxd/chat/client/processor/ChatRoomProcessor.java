@@ -1,7 +1,7 @@
 package com.xuxd.chat.client.processor;
 
 import com.xuxd.chat.common.Constants;
-import com.xuxd.chat.common.common.Message;
+import com.xuxd.chat.common.beans.Message;
 import com.xuxd.chat.common.menu.MenuOptions;
 import com.xuxd.chat.common.netty.AbstractEndpoint;
 

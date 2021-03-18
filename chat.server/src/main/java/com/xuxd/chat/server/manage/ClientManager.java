@@ -1,13 +1,12 @@
 package com.xuxd.chat.server.manage;
 
 import com.xuxd.chat.common.Constants;
-import com.xuxd.chat.common.common.Message;
+import com.xuxd.chat.common.beans.Message;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelId;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentMap;
 
 /**

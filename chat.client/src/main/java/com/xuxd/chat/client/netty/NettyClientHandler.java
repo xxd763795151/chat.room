@@ -1,7 +1,7 @@
 package com.xuxd.chat.client.netty;
 
 import com.xuxd.chat.client.ChatClient;
-import com.xuxd.chat.common.common.Message;
+import com.xuxd.chat.common.beans.Message;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;

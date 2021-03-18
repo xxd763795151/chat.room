@@ -7,7 +7,7 @@ import java.util.Scanner;
 /**
  * @Auther: 许晓东
  * @Date: 19-6-23 19:41
- * @Description:
+ * @Description: 通信端点基类
  */
 public abstract class AbstractEndpoint<T> extends ChannelDuplexHandler {
 
