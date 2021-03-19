@@ -2,6 +2,7 @@ package com.xuxd.chat.client;
 
 import com.xuxd.chat.client.netty.NettyClientConfig;
 import com.xuxd.chat.common.CmdParser;
+import com.xuxd.chat.common.utils.ConfigUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,14 +18,19 @@ public class ClientStartup {
     public static void main(String[] args) {
 
         LOGGER.info("start running chat client");
-        createClient(args).start();
+        try {
+            createClient(args).start();
+        } catch (Exception e) {
+            LOGGER.error("Start failed", e);
+        }
         LOGGER.info("chat client exit");
 
     }
 
-    private static ChatClient createClient(String[] args) {
+    private static ChatClient createClient(String[] args) throws Exception {
         initCmdParser(args);
         NettyClientConfig clientConfig = new NettyClientConfig();
+        ConfigUtils.load(clientConfig);
         cmdParser.cmd2Config(clientConfig);
         ChatClient chatClient = new ChatClient(clientConfig);
         return chatClient;

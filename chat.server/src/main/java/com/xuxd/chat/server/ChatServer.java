@@ -4,6 +4,7 @@ import com.xuxd.chat.common.Constants;
 import com.xuxd.chat.common.beans.Message;
 import com.xuxd.chat.common.menu.Menu;
 import com.xuxd.chat.common.netty.AbstractEndpoint;
+import com.xuxd.chat.common.utils.ConfigUtils;
 import com.xuxd.chat.server.manage.ClientManager;
 import com.xuxd.chat.server.netty.NettyServer;
 import com.xuxd.chat.server.netty.NettyServerConfig;
@@ -31,13 +32,14 @@ public class ChatServer extends AbstractEndpoint<Message> {
     }
 
     public void start() {
-        LOGGER.info("start chat room");
-        nettyServer.start();
-        menu = Menu.create();
-        LOGGER.info("start completed");
         try {
+            LOGGER.info("start chat room");
+            LOGGER.info("Server Config: " + System.lineSeparator() + ConfigUtils.formatConfig(this.nettyServerConfig));
+            nettyServer.start();
+            menu = Menu.create();
+            LOGGER.info("start completed");
             nettyServer.getChannel().closeFuture().sync();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             LOGGER.error("error: " + e);
         } finally {
             shutdown();

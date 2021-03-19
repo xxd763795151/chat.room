@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * @Auther: 许晓东
  * @Date: 19-6-14 16:43
- * @Description:
+ * @Description: 配置抽象类
  */
 public abstract class NettyConfig {
 
