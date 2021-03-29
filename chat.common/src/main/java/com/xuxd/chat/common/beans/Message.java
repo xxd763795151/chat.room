@@ -16,8 +16,14 @@ import java.util.Map;
 public class Message extends JSONObject implements Serializable {
 
     private int type;
+
     private String body;
+
     private Map<String, String> attachment = new HashMap<>();
+
+    private String client;
+
+    private long requestId;
 
     public Message() {
     }
@@ -55,7 +61,23 @@ public class Message extends JSONObject implements Serializable {
         this.attachment = attachment;
     }
 
-     @Override
+    public String getClient() {
+        return client;
+    }
+
+    public void setClient(String client) {
+        this.client = client;
+    }
+
+    public long getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(long requestId) {
+        this.requestId = requestId;
+    }
+
+    @Override
     public Object put(String key, Object value) {
         return attachment.put(key, String.valueOf(value));
     }

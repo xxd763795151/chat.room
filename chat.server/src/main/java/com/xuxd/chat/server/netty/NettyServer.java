@@ -1,7 +1,9 @@
 package com.xuxd.chat.server.netty;
 
 import com.xuxd.chat.common.netty.NettyRemoting;
+import com.xuxd.chat.common.netty.decoder.MsgFrameDecoder;
 import com.xuxd.chat.common.netty.decoder.MsgPackDecoder;
+import com.xuxd.chat.common.netty.encoder.MsgFrameEncoder;
 import com.xuxd.chat.common.netty.encoder.MsgPackEncoder;
 import com.xuxd.chat.server.ChatServer;
 import io.netty.bootstrap.ServerBootstrap;
@@ -9,8 +11,8 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +46,7 @@ public class NettyServer implements NettyRemoting {
         bootstrap = new ServerBootstrap();
         bossGroup = new NioEventLoopGroup(config.getBossThreads(), new DefaultThreadFactory("ChatServerBoss", true));
         workerGroup = new NioEventLoopGroup(config.getWorkerThreads(), new DefaultThreadFactory("ChatServerWorker", true));
+        bootstrap.handler(new LoggingHandler(LogLevel.DEBUG));
         final ChannelHandler handler = new NettyServerHandler(chatServer);
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
@@ -56,10 +59,10 @@ public class NettyServer implements NettyRemoting {
                         ch.pipeline().addLast(
                                 /*new DelimiterBasedFrameDecoder(65535, delimiter)
                                 , new StringDecoder(Charset.forName(Constants.CharsetName.UTF_8))*/
-                                new LengthFieldBasedFrameDecoder(65535, 0, 2, 0, 2)
-                                , new MsgPackDecoder()
-                                , new LengthFieldPrepender(2)
+                                new MsgFrameDecoder()
+                                , new MsgFrameEncoder()
                                 , new MsgPackEncoder()
+                                , new MsgPackDecoder()
                                 , handler
                         );
                     }
@@ -67,7 +70,6 @@ public class NettyServer implements NettyRemoting {
         ChannelFuture future = bootstrap.bind().syncUninterruptibly();
         LOGGER.info("netty server started, bind ip:{},port:{}", config.getIp(), config.getPort());
         channel = future.channel();
-
     }
 
     public void close() {
