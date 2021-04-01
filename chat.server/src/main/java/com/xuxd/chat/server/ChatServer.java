@@ -70,7 +70,7 @@ public class ChatServer extends AbstractEndpoint<Message> {
                 clientManager.switchState(ctx.channel(), message);
                 break;
             case Constants.MsgType.MESSAGE:
-            case Constants.MsgType.NOTIFY:
+            case Constants.MsgType.BROADCAST:
                 // 转发消息
                 clientManager.dispatcher(ctx.channel(), message);
                 break;
@@ -82,7 +82,7 @@ public class ChatServer extends AbstractEndpoint<Message> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         String welcome = menu.welcome() + Constants.RETURN_NEW_LINE + menu.menu();
-        Message message = new Message(Constants.MsgType.NOTIFY, welcome);
+        Message message = new Message(Constants.MsgType.BROADCAST, welcome);
         ctx.write(message);
         ctx.flush();
         clientManager.registerClient(ctx.channel(), message.getInnerMap());

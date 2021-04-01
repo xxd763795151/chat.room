@@ -87,7 +87,7 @@ public class ClientManager {
             }
             ClientState clientState = clientStateMap.get(ClientState.State.CHAT_ROOM);
             clientState.register(src, message.getInnerMap());
-        } else if (Constants.Command.RETURN_MEUN.equals(command)) {
+        } else if (Constants.Command.RETURN_MENU.equals(command)) {
             registerClient(src, message.getInnerMap());
         }
     }

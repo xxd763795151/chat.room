@@ -33,7 +33,7 @@ public class ChatRoomProcessor implements Processor {
         String input = String.format(">>>>>>>>>>>>>>>>>>>>%s进入聊天室<<<<<<<<<<<<<<<<<<<", clientName);
         System.out.println(input);
         isMenuState = false;
-        endpoint.write(new Message(Constants.MsgType.NOTIFY, input));
+        endpoint.write(new Message(Constants.MsgType.BROADCAST, input));
         Scanner scanner = new Scanner(System.in);
         while (true) {
             if (!isMenuState) {

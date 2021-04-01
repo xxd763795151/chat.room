@@ -137,7 +137,7 @@ public class ChatClient extends AbstractEndpoint<Message> {
             case Constants.MsgType.MESSAGE:
 
                 break;
-            case Constants.MsgType.NOTIFY:
+            case Constants.MsgType.BROADCAST:
                 echo(message.getBody());
                 break;
             default:
