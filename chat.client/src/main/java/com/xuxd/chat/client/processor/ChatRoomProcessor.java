@@ -1,6 +1,7 @@
 package com.xuxd.chat.client.processor;
 
 import com.xuxd.chat.common.Constants;
+import com.xuxd.chat.common.LRUCache;
 import com.xuxd.chat.common.beans.Message;
 import com.xuxd.chat.common.menu.MenuOptions;
 import com.xuxd.chat.common.netty.AbstractEndpoint;
@@ -13,9 +14,16 @@ import java.util.Scanner;
  * @Description:
  */
 public class ChatRoomProcessor implements Processor {
+
     private AbstractEndpoint<Message> endpoint;
+
     private String clientName = null;
+
     private boolean isMenuState = false;
+
+    private final Object DUMMY = new Object();
+
+    private LRUCache<Long, Object> requestCache = new LRUCache<Long, Object>(800, 500);
 
     public ChatRoomProcessor(AbstractEndpoint<Message> endpoint) {
         this.endpoint = endpoint;

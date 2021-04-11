@@ -1,5 +1,6 @@
 package com.xuxd.chat.common.netty;
 
+import com.xuxd.chat.common.utils.SystemUtils;
 import io.netty.channel.ChannelDuplexHandler;
 
 import java.util.Scanner;
@@ -14,6 +15,12 @@ public abstract class AbstractEndpoint<T> extends ChannelDuplexHandler {
     public abstract void start();
 
     public abstract void shutdown();
+
+    private static final String ENDPOINT_ID;
+
+    static {
+        ENDPOINT_ID = SystemUtils.getClientId();
+    }
 
     public void echo(Object message) {
         System.out.println(message);
@@ -31,5 +38,9 @@ public abstract class AbstractEndpoint<T> extends ChannelDuplexHandler {
     protected String input() {
         Scanner scanner = new Scanner(System.in);
         return scanner.next();
+    }
+
+    public static String getEndpointId() {
+        return ENDPOINT_ID;
     }
 }

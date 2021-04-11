@@ -1,11 +1,12 @@
 package com.xuxd.chat.common.beans;
 
 import com.alibaba.fastjson.JSONObject;
-import org.msgpack.annotation.Optional;
+import com.xuxd.chat.common.netty.AbstractEndpoint;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @Auther: 许晓东
@@ -15,6 +16,8 @@ import java.util.Map;
 @org.msgpack.annotation.Message
 public class Message extends JSONObject implements Serializable {
 
+    private static final AtomicLong id = new AtomicLong(0L);
+
     private int type;
 
     private String body;
@@ -23,7 +26,7 @@ public class Message extends JSONObject implements Serializable {
 
     private String client;
 
-    private long requestId;
+    private long requestId = id.getAndIncrement();
 
     public Message() {
     }
@@ -33,8 +36,13 @@ public class Message extends JSONObject implements Serializable {
     }
 
     public Message(int type, String body) {
+        this(type, body, AbstractEndpoint.getEndpointId());
+    }
+
+    public Message(int type, String body, String client) {
         this.type = type;
         this.body = body;
+        this.client = client;
     }
 
     public int getType() {
